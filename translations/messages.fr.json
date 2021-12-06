@@ -1,0 +1,4 @@
+{
+  "yyyy-mm-dd": "{day}/{month}/{year}",
+  "yyyy-mm": "{month}/{year}"
+}
