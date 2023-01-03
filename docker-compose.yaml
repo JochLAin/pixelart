@@ -4,7 +4,6 @@ services:
         container_name: "${APP_NAME}-app"
         volumes: ["./:/home/docker"]
         working_dir: "/home/docker"
-        ports: ["127.0.0.1:48200:3000"]
         networks: ["proxy"]
         tty: true
         user: "1000"
