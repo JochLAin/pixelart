@@ -1,5 +1,15 @@
-import App from "../assets/components";
+import PixelArt from "#assets/capsules";
+import { StoreBuilderProps } from "#assets/contexts/store";
+import { useLocalStorage } from "#assets/hooks";
 
-const Main = () => <App />;
+export default function Index() {
+  const [state, setState] = useLocalStorage<StoreBuilderProps>('pixelart');
 
-export default Main;
+  return <PixelArt
+    {...(state || {})}
+    onChange={(state) => {
+      const { clip, clipHeight, clipWidth } = state;
+      setState({ clip, height: clipHeight, width: clipWidth });
+    }}
+  />;
+}

@@ -23,7 +23,12 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "strict": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+    "incremental": true,
+    "paths": {
+      "#assets": ["assets/*"],
+      "#pages": ["pages/*"]
+    }
   },
   "exclude": [
     "node_modules"

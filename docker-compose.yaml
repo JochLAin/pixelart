@@ -1,13 +1,17 @@
 services:
     app:
-        image: "node:14"
+        image: "node:18"
         container_name: "${APP_NAME}-app"
         volumes: ["./:/home/docker"]
         working_dir: "/home/docker"
-        networks: ["proxy"]
+        networks: ["default", "proxy"]
+        ports: ["48903:3000"]
         tty: true
         user: "1000"
         command: "npm run dev"
+        restart: "unless-stopped"
+        environment:
+            - "FONTAWESOME_NPM_AUTH_TOKEN=${FONTAWESOME_NPM_AUTH_TOKEN}"
         labels:
             - "traefik.enable=true"
             - "traefik.docker.network=proxy"

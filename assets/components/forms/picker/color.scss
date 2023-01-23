@@ -1,0 +1,167 @@
+body {
+  background-color: #e0e0e0;
+}
+
+.color-picker {
+  // Declare constants
+  --sqrt-3: 1.7320508075688772935274463415058723669428052538103806280558069794519330169088000370811461867572485756756261414154;
+  --pi:     3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132;
+
+  --color-picker-bg: #e0e0e0;
+  --color-picker-size: 20rem;
+  --color-picker-circle-width: 1.5rem;
+  --color-picker-pointer-size: .5rem;
+  --color-picker-pointer-border: 2px;
+  --color-picker-triangle-margin: .15rem;
+  --color-picker-triangle-padding: .15rem;
+  --color-picker-hue: 0;
+  --color-picker-white: calc(2 * var(--sqrt-3) / 3);
+  --color-picker-black: calc(2 * var(--sqrt-3) / 3);
+
+  --color-picker-hue-angle: calc(var(--color-picker-hue) * 1deg);
+  --color-picker-hue-white-percent: calc(var(--color-picker-white) * 100%);
+  --color-picker-hue-black-percent: calc(var(--color-picker-black) * 100%);
+  --color-picker-value: hwb(var(--color-picker-hue) var(--color-picker-hue-white-percent) var(--color-picker-hue-black-percent));
+
+  --color-picker-triangle-outer-radius: calc((var(--color-picker-size) / 2) - var(--color-picker-circle-width) - var(--color-picker-triangle-margin));
+  --color-picker-triangle-outer-offset: calc(var(--color-picker-circle-width) + var(--color-picker-triangle-margin));
+  --color-picker-triangle-diameter: calc((var(--color-picker-triangle-outer-radius) - var(--color-picker-triangle-padding)) * 2);
+  --color-picker-triangle-width: calc(var(--color-picker-triangle-diameter) / 2 * var(--sqrt-3));
+  --color-picker-triangle-height: calc(var(--color-picker-triangle-width) * var(--sqrt-3) / 2);
+  --color-picker-triangle-patch-top: calc(var(--color-picker-triangle-height) + var(--color-picker-triangle-padding));
+  --color-picker-triangle-patch-top-opposite: calc(var(--color-picker-triangle-patch-top) * -1);
+
+  --color-picker-pointer-offset-x: calc((var(--color-picker-size) - var(--color-picker-triangle-width)) / 2);
+  --color-picker-pointer-x: calc(var(--color-picker-triangle-width) / 2);
+  --color-picker-pointer-offset-y: var(--color-picker-triangle-outer-offset);
+  --color-picker-pointer-y: 0px;
+
+  position: relative;
+  width: var(--color-picker-size);
+  height: var(--color-picker-size);
+  background: var(--color-picker-bg);
+
+  &--circle {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(from 0deg, #F00 0%, #FF0 17%, #0F0 33%, #0FF 50%, #00F 67%, #F0F 83%, #F00 100%);
+    border-radius: 50%;
+
+    &::before {
+      position: absolute;
+      content: '';
+      inset: var(--color-picker-circle-width);
+      background: var(--color-picker-bg);
+      border-radius: 50%;
+    }
+  }
+
+  &--triangle {
+    position: absolute;
+    top: var(--color-picker-triangle-outer-offset);
+    left: var(--color-picker-triangle-outer-offset);
+    width: calc(var(--color-picker-triangle-outer-radius) * 2);
+    height: calc(var(--color-picker-triangle-outer-radius) * 2);
+    background: #FFF;
+    border-radius: 50%;
+    transform: rotate(var(--color-picker-hue-angle));
+    transform-origin: center;
+    overflow: hidden;
+
+    &::before {
+      position: absolute;
+      inset: var(--color-picker-triangle-padding);
+      left: calc((var(--color-picker-triangle-diameter) - var(--color-picker-triangle-width)) / 2 + var(--color-picker-triangle-padding));
+      width: var(--color-picker-triangle-width);
+      height: var(--color-picker-triangle-height);
+      content: '';
+      background-blend-mode: multiply, normal, normal;
+      //background-blend-mode: multiply, multiply, multiply;
+      background:
+        linear-gradient(to bottom, hwb(var(--color-picker-hue-angle) 0% 0%) 0%, transparent 100%),
+        linear-gradient(120deg, #FFF 0%, transparent 100%),
+        linear-gradient(-120deg, #000 0%, transparent 100%),
+      ;
+    }
+
+    &-patch {
+      &,
+      &::before,
+      &::after {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        background: var(--color-picker-bg);
+        transform: translateY(var(--color-picker-triangle-patch-top));
+        transform-origin: center;
+      }
+
+      &::before {
+        transform:
+          translateY(var(--color-picker-triangle-patch-top-opposite))
+          rotate(-120deg)
+          translateY(var(--color-picker-triangle-patch-top))
+        ;
+      }
+
+      &::after {
+        transform:
+          translateY(var(--color-picker-triangle-patch-top-opposite))
+          rotate(120deg)
+          translateY(var(--color-picker-triangle-patch-top))
+        ;
+      }
+    }
+
+    &-pointer {
+      position: absolute;
+      top: calc(var(--color-picker-pointer-y) + var(--color-picker-pointer-offset-y) - var(--color-picker-pointer-border) - var(--color-picker-pointer-size) / 2);
+      left: calc(var(--color-picker-pointer-x) + var(--color-picker-pointer-offset-x) - var(--color-picker-pointer-border) - var(--color-picker-pointer-size) / 2);
+      width: var(--color-picker-pointer-size);
+      height: var(--color-picker-pointer-size);
+      border: var(--color-picker-pointer-border) solid black;
+      border-radius: 50%;
+      pointer-events: none;
+      user-select: none;
+      z-index: 3;
+    }
+  }
+
+  input[type="color"] {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &::before {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 1rem);
+    width: 1rem;
+    height: 1rem;
+    content: '';
+    background: var(--color-picker-value);
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: calc(var(--color-picker-circle-width) + var(--color-picker-triangle-margin) - 1px);
+    background: transparent;
+    border: 3px solid var(--color-picker-bg);
+    border-radius: 50%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 2;
+  }
+}
+
+//@supports (top: calc(100px * sin(120deg))) {
+//
+//}

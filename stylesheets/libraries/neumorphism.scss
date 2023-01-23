@@ -1,0 +1,133 @@
+$neumorphism-angle: 60deg;
+$neumorphism-color: #e0e0e0;
+$neumorphism-distance: 3px;
+$neumorphism-intensity: 0.15;
+
+$neumorphism-corner-top-left: 'top-left';
+$neumorphism-corner-top-right: 'top-right';
+$neumorphism-corner-bottom-left: 'bottom-left';
+$neumorphism-corner-bottom-right: 'bottom-right';
+
+$neumorphism-shape-flat: 'flat';
+$neumorphism-shape-pressed: 'pressed';
+$neumorphism-shape-concave: 'concave';
+$neumorphism-shape-convex: 'convex';
+
+$neumorphism-shapes:
+  $neumorphism-shape-flat
+  $neumorphism-shape-pressed
+  $neumorphism-shape-concave
+  $neumorphism-shape-convex
+;
+
+$neumorphism-angles: (
+  $neumorphism-corner-top-left: 145deg,
+  $neumorphism-corner-top-right: 225deg,
+  $neumorphism-corner-bottom-left: 315deg,
+  $neumorphism-corner-bottom-right: 45deg,
+);
+
+@function neumorphism-luminance(
+  $color: $neumorphism-color,
+  $intensity: $neumorphism-intensity,
+) {
+  @return rgb(
+      round(min(max(0, red($color) + red($color) * $intensity), 255)),
+      round(min(max(0, green($color) + green($color) * $intensity), 255)),
+      round(min(max(0, blue($color) + blue($color) * $intensity), 255)),
+  );
+}
+
+@mixin neumorphism-declare-background(
+  $color: $neumorphism-color,
+  $shape: $neumorphism-shape-flat,
+  $corner: $neumorphism-corner-top-left,
+) {
+  $is-shape-flat: index([$neumorphism-shape-flat, $neumorphism-shape-pressed], $shape);
+
+  $background: $color;
+  @if (not $is-shape-flat) {
+    $background: linear-gradient(
+        map-get($neumorphism-angles, $corner),
+        neumorphism-luminance($color, if($shape == $neumorphism-shape-convex, 0.007, -0.1)),
+        neumorphism-luminance($color, if($shape == $neumorphism-shape-concave, 0.007, -0.1))
+    );
+  }
+
+  --neumorphism-background: #{$background};
+}
+
+@mixin neumorphism-declare-shadow(
+  $color: $neumorphism-color,
+  $shape: $neumorphism-shape-flat,
+  $corner: $neumorphism-corner-top-left,
+  $distance: $neumorphism-distance,
+  $intensity: $neumorphism-intensity,
+  $blur: $distance * 2,
+) {
+  $is-corner-bottom: index([$neumorphism-corner-bottom-left, $neumorphism-corner-bottom-right], $corner);
+  $is-corner-right: index([$neumorphism-corner-top-right, $neumorphism-corner-bottom-right], $corner);
+
+  $color-dark: neumorphism-luminance($color, $intensity * -1);
+  $color-light: neumorphism-luminance($color, $intensity);
+
+  $position-x: $distance * if($is-corner-right, -1, 1);
+  $position-y: $distance * if($is-corner-bottom, -1, 1);
+
+  --neumorphism-angle: #{map-get($neumorphism-angles, $corner)};
+  --neumorphism-blur: #{$blur};
+  --neumorphism-color-dark: #{$color-dark};
+  --neumorphism-color-light: #{$color-light};
+  --neumorphism-position-x: #{$position-x};
+  --neumorphism-position-y: #{$position-y};
+  --neumorphism-type: #{if($shape == $neumorphism-shape-pressed, 'inset', '')};
+}
+
+@mixin neumorphism-background(
+  $color: $neumorphism-color,
+  $shape: $neumorphism-shape-flat,
+  $corner: $neumorphism-corner-top-left,
+) {
+  @include neumorphism-declare-background($color, $shape, $corner);
+  @extend %neumorphism-background;
+}
+
+@mixin neumorphism-shadow(
+  $color: $neumorphism-color,
+  $shape: $neumorphism-shape-flat,
+  $corner: $neumorphism-corner-top-left,
+  $distance: $neumorphism-distance,
+  $intensity: $neumorphism-intensity,
+  $blur: $distance * 2,
+) {
+  @include neumorphism-declare-shadow($color, $shape, $corner, $distance, $intensity, $blur);
+  @extend %neumorphism-shadow;
+}
+
+@mixin neumorphism(
+  $color: $neumorphism-color,
+  $shape: $neumorphism-shape-flat,
+  $corner: $neumorphism-corner-top-left,
+  $distance: $neumorphism-distance,
+  $intensity: $neumorphism-intensity,
+  $blur: $distance * 2,
+) {
+  @include neumorphism-background($color, $shape, $corner);
+  @include neumorphism-shadow($color, $shape, $corner, $distance, $intensity, $blur);
+}
+
+%neumorphism-background {
+  background: var(--neumorphism-background);
+}
+
+%neumorphism-shadow {
+  box-shadow:
+    var(--neumorphism-type) var(--neumorphism-position-x) var(--neumorphism-position-y) var(--neumorphism-blur) var(--neumorphism-color-dark),
+    var(--neumorphism-type) calc(var(--neumorphism-position-x) * -1) calc(var(--neumorphism-position-y) * -1) var(--neumorphism-blur) var(--neumorphism-color-light)
+;
+}
+
+:root {
+  @include neumorphism-declare-background();
+  @include neumorphism-declare-shadow();
+}

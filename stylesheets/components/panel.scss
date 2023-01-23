@@ -1,0 +1,64 @@
+.panel {
+  background-color: var(--color-accent);
+  width: 100%;
+
+  &--header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 2.5rem;
+    padding-left: .5rem;
+    background-color: var(--color-accent);
+    line-height: 2.5rem;
+  }
+
+  &--title {
+    font-size: var(--font-size-fluid-1);
+    font-weight: var(--font-weight-7);
+  }
+
+  &--actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &--container {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    padding: .5rem;
+    border-radius: 5px;
+  }
+
+  &--list,
+  &--grid {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: .5rem;
+      cursor: pointer;
+
+      &.empty {
+        //@include neumorphism($color-major, $neumorphism-shape-flat);
+      }
+      &.active {
+        //@include neumorphism($color-major, $neumorphism-shape-pressed);
+      }
+    }
+  }
+
+  &--list {
+    flex-direction: column;
+  }
+
+  &--grid {
+    flex-direction: row;
+  }
+}
