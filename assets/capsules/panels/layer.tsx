@@ -1,5 +1,3 @@
-import { icon } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { MouseEvent } from "react";
 import useStore from "../../contexts/store";
@@ -14,7 +12,7 @@ export default function LayerPanel() {
   };
 
   return <>
-    <ul id="layer" className="panel--list">
+    <ul className="panel--list">
       {store.frame.map((layer, idx) => {
         const className = classNames('layer--item', {
           active: idx === store.layerIdx,
@@ -32,4 +30,3 @@ export default function LayerPanel() {
     </ul>
   </>
 }
-

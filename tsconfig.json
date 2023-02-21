@@ -1,41 +1,21 @@
 {
+  "references": [{ "path": "./tsconfig.node.json" }],
   "compilerOptions": {
-    "module": "esnext",
-    "target": "es5",
-    "lib": [
-      "es7",
-      "dom"
-    ],
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "resolveJsonModule": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
     "skipLibCheck": true,
-    "strictNullChecks": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "incremental": true,
-    "paths": {
-      "#assets": ["assets/*"],
-      "#pages": ["pages/*"]
-    }
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "include": ["assets"]
 }

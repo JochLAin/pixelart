@@ -1,25 +1,23 @@
-import React, { HTMLProps, MouseEvent, WheelEvent, forwardRef, useRef } from "react";
-import { useForwardedRef } from "../../hooks";
-import { EditorContext, buildEditorState } from "../../contexts/editor";
+import React, { HTMLProps, MouseEvent, WheelEvent, useRef } from "react";
+import useEditor from "../../contexts/editor";
 import * as utils from "../../utils";
-import CanvasEditor from "../canvas/editor";
 
 type PanelEditorProps = HTMLProps<HTMLDivElement> & {
-
+  refCanvas: React.RefObject<HTMLCanvasElement>;
 };
 
-export default forwardRef<HTMLCanvasElement, PanelEditorProps>(function PanelEditor(props, ref) {
-  ref = useForwardedRef<HTMLCanvasElement>(ref);
+export default function PanelEditor(props: PanelEditorProps) {
+  const { refCanvas, ...attr } = props;
   const refPreviousX = useRef<number|null>(null);
   const refPreviousY = useRef<number|null>(null);
-  const state = buildEditorState(ref);
+  const editor = useEditor();
 
   const move = (evt: MouseEvent, cx: number, cy: number) => {
     if (utils.isMouseButtonMiddle(evt)) {
       const dx = cx - (refPreviousX.current || cx);
       const dy = cy - (refPreviousY.current || cy);
       if (dx || dy) {
-        state.move(dx, dy);
+        editor.move(dx, dy);
       }
     }
     refPreviousX.current = null;
@@ -63,9 +61,9 @@ export default forwardRef<HTMLCanvasElement, PanelEditorProps>(function PanelEdi
     evt.preventDefault();
     evt.stopPropagation();
 
-    const buttons = utils.getInputValue(evt);
+    const buttons = utils.getMouseValue(evt);
     if (!(utils.isCtrlKey(buttons) || utils.isShiftKey(buttons))) {
-      state.zoom(
+      editor.zoom(
         evt.nativeEvent.offsetX,
         evt.nativeEvent.offsetY,
         evt.deltaY >= 0 ? -1 : 1,
@@ -73,9 +71,19 @@ export default forwardRef<HTMLCanvasElement, PanelEditorProps>(function PanelEdi
     }
   };
 
-  return <EditorContext.Provider value={state}>
-    <section {...props} id="editor" onContextMenu={onContextMenu} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onScroll={onScroll} onWheel={onWheel}>
-      <CanvasEditor ref={ref} />
-    </section>
-  </EditorContext.Provider>;
-});
+  return <article {...attr} onContextMenu={onContextMenu} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onScroll={onScroll} onWheel={onWheel}>
+    {props.children}
+  </article>;
+}
+
+export function PanelEditorFooter() {
+  const editor = useEditor();
+
+  return <footer>
+    {(editor.positionX !== undefined && editor.positionY !== undefined) ? (
+      `${editor.positionY + 1}:${editor.positionX + 1}`
+    ) : (
+      <b>{'¯\\_(ツ)_/¯'}</b>
+    )}
+  </footer>;
+}

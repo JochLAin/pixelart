@@ -7,7 +7,6 @@
   padding: 0;
   margin: 0;
   background-color: var(--color-accent);
-  border-bottom: 3px solid var(--color-accent);
   list-style: none;
 
   li {
@@ -16,8 +15,16 @@
   }
 }
 
-.nav--tab {
+.nav--tabs {
   @extend .nav;
+  overflow-x: auto;
+
+  &-bottom {
+    border-top: 3px solid var(--color-accent);
+  }
+  &:not(&-bottom) {
+    border-bottom: 3px solid var(--color-accent);
+  }
 
   li {
     cursor: pointer;

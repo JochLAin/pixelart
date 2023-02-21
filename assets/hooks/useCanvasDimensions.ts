@@ -1,7 +1,7 @@
 import {MutableRefObject, RefObject, useEffect, useState} from "react";
 import * as utils from "../utils";
 
-export default function useCanvasDimensions(ref: MutableRefObject<HTMLCanvasElement>|RefObject<HTMLCanvasElement>, clipWidth: number, clipHeight: number): number {
+export default function useCanvasDimensions(ref: MutableRefObject<HTMLCanvasElement>|RefObject<HTMLCanvasElement>, spriteWidth: number, spriteHeight: number): number {
   const [pixelSize, setPixelSize] = useState<number>(10);
 
   useEffect(() => {
@@ -10,10 +10,10 @@ export default function useCanvasDimensions(ref: MutableRefObject<HTMLCanvasElem
       if (!canvas) return;
 
       const [parentWidth, parentHeight] = utils.getElementDimensions(canvas.parentElement as HTMLElement);
-      const pixelSize = utils.getPixelDimensions(clipWidth, clipHeight, parentWidth, parentHeight);
+      const pixelSize = utils.getPixelDimensions(spriteWidth, spriteHeight, parentWidth, parentHeight);
 
-      canvas.setAttribute('height', String(Math.floor(clipHeight * pixelSize)));
-      canvas.setAttribute('width', String(Math.floor(clipWidth * pixelSize)));
+      canvas.setAttribute('height', String(Math.floor(spriteHeight * pixelSize)));
+      canvas.setAttribute('width', String(Math.floor(spriteWidth * pixelSize)));
       canvas.style.removeProperty('height');
       canvas.style.removeProperty('width');
 
@@ -25,7 +25,7 @@ export default function useCanvasDimensions(ref: MutableRefObject<HTMLCanvasElem
     return () => {
       window.removeEventListener('resize', onResize);
     };
-  }, [ref, clipWidth, clipHeight]);
+  }, [ref, spriteWidth, spriteHeight]);
 
   return pixelSize;
 }

@@ -1,14 +1,19 @@
 import { Reducer, RefObject, createContext, useContext, useEffect, useReducer } from "react";
 import * as utils from "../utils";
 import useStore from "./store";
+import useCanvasDimensions from "../hooks/useCanvasDimensions";
 
 type EditorStateProps = {
-  pixelSize: number,
   offsetX: number,
   offsetY: number,
+  positionX?: number,
+  positionY?: number,
+  zoomLevel: number,
 };
 
 type EditorState = EditorStateProps & {
+  pixelSize: number,
+  hover: (x?: number, y?: number) => void,
   move: (x: number, y: number) => void,
   zoom: (x: number, y: number, delta: number) => void,
 };
@@ -22,20 +27,14 @@ export const EditorContext = createContext<EditorState|null>(null);
 
 export function buildEditorState(ref: RefObject<HTMLCanvasElement>): EditorState {
   const store = useStore();
-  const [state, dispatch] = useReducer<EditorReducer>((state, action) => {
-    return { ...state, ...action };
-  },{
-    pixelSize: 10,
+  const pixelSize = useCanvasDimensions(ref, store.spriteWidth, store.spriteHeight);
+
+  const [state, dispatch] = useReducer<EditorReducer>(
+    (state, action) => ({ ...state, ...action }), {
     offsetX: 0,
     offsetY: 0,
+    zoomLevel: 1,
   });
-
-  useEffect(() => {
-    if (ref.current) {
-      const pixelSize = utils.getDefaultPixelDimension(ref.current, store.clipWidth, store.clipHeight);
-      dispatch({ pixelSize });
-    }
-  }, []);
 
   useEffect(() => {
     ref.current?.style.setProperty('--offset-x', `${state.offsetX}px`);
@@ -46,7 +45,11 @@ export function buildEditorState(ref: RefObject<HTMLCanvasElement>): EditorState
   ]);
 
   return {
+    pixelSize: Math.floor(pixelSize * state.zoomLevel),
     ...state,
+    hover(x, y) {
+      return dispatch({ positionX: x, positionY: y });
+    },
     move(x, y) {
       const offsetX = state.offsetX + x;
       const offsetY = state.offsetY + y;
@@ -55,14 +58,15 @@ export function buildEditorState(ref: RefObject<HTMLCanvasElement>): EditorState
     },
     zoom(posX: number, posY: number, delta: number) {
       const factor = delta > 0 ? 1.1 : 0.9;
-      if ((state.pixelSize * factor) < 1) {
+      if ((pixelSize * factor) < 10) {
         return;
       }
 
+      const { offsetX, offsetY } = state;
       return dispatch({
-        pixelSize: Math.floor(state.pixelSize * factor),
-        offsetX: state.offsetX + Math.round(posX - posX * factor),
-        offsetY: state.offsetY + Math.round(posY - posY * factor),
+        offsetX: Math.floor(offsetX * factor + (posX - posX * factor)),
+        offsetY: Math.floor(offsetY * factor + (posY - posY * factor)),
+        zoomLevel: state.zoomLevel * factor,
       });
     }
   };

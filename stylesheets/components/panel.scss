@@ -2,6 +2,11 @@
   background-color: var(--color-accent);
   width: 100%;
 
+  &--title {
+    margin: .25rem 0 .25rem .5rem;
+    font-size: var(--font-size-fluid-0);
+  }
+
   &--header {
     display: flex;
     justify-content: space-between;
@@ -10,11 +15,12 @@
     padding-left: .5rem;
     background-color: var(--color-accent);
     line-height: 2.5rem;
-  }
 
-  &--title {
-    font-size: var(--font-size-fluid-1);
-    font-weight: var(--font-weight-7);
+    &--title {
+      margin: 0;
+      font-size: var(--font-size-fluid-1);
+      font-weight: var(--font-weight-7);
+    }
   }
 
   &--actions {
@@ -34,14 +40,15 @@
   &--list,
   &--grid {
     display: flex;
+    flex-flow: row wrap;
     width: 100%;
     margin: 0;
     padding: 0;
+    list-style: none;
 
     li {
-      display: flex;
-      align-items: center;
-      width: 100%;
+      //display: flex;
+      //align-items: center;
       padding: .5rem;
       cursor: pointer;
 
@@ -49,7 +56,7 @@
         //@include neumorphism($color-major, $neumorphism-shape-flat);
       }
       &.active {
-        //@include neumorphism($color-major, $neumorphism-shape-pressed);
+        background-color: var(--color-accent);
       }
     }
   }

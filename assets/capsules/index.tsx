@@ -1,15 +1,18 @@
-import { forwardRef, useEffect } from "react";
+import React, {forwardRef, RefObject, useEffect} from "react";
 import Tab, { TabItem } from "../components/tab";
+import { EditorContext, buildEditorState } from "../contexts/editor";
 import { StoreBuilderProps, StoreContext, buildStoreState } from "../contexts/store";
-import CanvasFrame from "./canvas/frame";
-import PanelEditor from "./panels/editor";
+import PanelEditor, { PanelEditorFooter } from "./panels/editor";
+import PanelColor from "./panels/color";
 import PanelFrame from "./panels/frame";
 import PanelLayer from "./panels/layer";
+import PanelPalette from "./panels/palette";
 import PanelTool from "./panels/tool";
-import Settings from "./settings";
+import { useForwardedRef } from "../hooks";
+import CanvasEditor from "./canvas/editor";
 
 export default forwardRef<HTMLCanvasElement, StoreBuilderProps>(function Main(props, ref) {
-  const store = buildStoreState(props);
+  ref = useForwardedRef<HTMLCanvasElement>(ref);
 
   useEffect(() => {
     const onScroll = (evt: Event) => {
@@ -23,22 +26,49 @@ export default forwardRef<HTMLCanvasElement, StoreBuilderProps>(function Main(pr
     }
   }, []);
 
-  return <StoreContext.Provider value={store}>
-    <div id="container-layer-frame" className="panel">
-      <Tab>
-        <TabItem title="Calques">
-          <PanelLayer />
-        </TabItem>
-        <TabItem title="Frames">
-          <PanelFrame />
-        </TabItem>
-      </Tab>
-    </div>
-    <PanelTool />
-    <section id="preview">
-      <CanvasFrame frame={store.clip[0]} />
+  return <StoreProvider {...props}>
+    <section>
+      <PanelTool />
+      <PanelColor />
+      <PanelPalette />
     </section>
-    <PanelEditor ref={ref} />
-    <Settings />
-  </StoreContext.Provider>;
+    <section>
+      <EditorProvider refCanvas={ref}>
+        <PanelEditor refCanvas={ref}>
+          <CanvasEditor ref={ref} />
+        </PanelEditor>
+        <PanelEditorFooter />
+      </EditorProvider>
+    </section>
+    <section>
+      <section>
+      </section>
+      <section className="panel">
+        <Tab>
+          <TabItem title="Calques">
+            <PanelLayer />
+          </TabItem>
+          <TabItem title="Frames">
+            <PanelFrame />
+          </TabItem>
+        </Tab>
+      </section>
+    </section>
+  </StoreProvider>;
 });
+
+function StoreProvider(props: StoreBuilderProps & { children: any }) {
+  const store = buildStoreState(props);
+
+  return <StoreContext.Provider value={store}>
+    {props.children}
+  </StoreContext.Provider>
+}
+
+function EditorProvider(props: { refCanvas: RefObject<HTMLCanvasElement>, children: any }) {
+  const editor = buildEditorState(props.refCanvas);
+
+  return <EditorContext.Provider value={editor}>
+    {props.children}
+  </EditorContext.Provider>;
+}

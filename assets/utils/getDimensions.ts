@@ -17,14 +17,14 @@ export function getElementDimensions(element: Element): [number, number] {
   ];
 }
 
-export function getPixelDimensions(clipWidth: number, clipHeight: number, parentWidth: number, parentHeight: number): number {
+export function getPixelDimensions(spriteWidth: number, spriteHeight: number, parentWidth: number, parentHeight: number): number {
   if (parentWidth > parentHeight) {
-    return Math.floor(parentHeight / clipHeight);
+    return Math.floor(parentHeight / spriteHeight);
   }
-  return Math.floor(parentWidth / clipWidth);
+  return Math.floor(parentWidth / spriteWidth);
 }
 
-export function getDefaultPixelDimension(canvas: HTMLCanvasElement, clipWidth: number, clipHeight: number): number {
+export function getDefaultPixelDimension(canvas: HTMLCanvasElement, spriteWidth: number, spriteHeight: number): number {
   const [parentWidth, parentHeight] = getElementDimensions(canvas.parentElement as HTMLElement);
-  return getPixelDimensions(clipWidth, clipHeight, parentWidth, parentHeight);
+  return getPixelDimensions(spriteWidth, spriteHeight, parentWidth, parentHeight);
 }

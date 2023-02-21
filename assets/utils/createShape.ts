@@ -1,3 +1,5 @@
+import { Clip, Frame, Layer } from "../contexts/store";
+
 export function createFrame(width: number, height: number) {
   return [createLayer(width, height)];
 }
@@ -15,7 +17,7 @@ export function createDamier(width: number = 10, height: number = 10, colorEven?
   });
 }
 
-export function createLine(width: number, px: number, py: number, cx: number, cy: number) {
+export function createLine(width: number, px: number, py: number, cx: number, cy: number): number[] {
   const pixels = [];
 
   const dx = Math.abs(cx - px);
@@ -42,4 +44,32 @@ export function createLine(width: number, px: number, py: number, cx: number, cy
   }
 
   return pixels;
+}
+
+export function createCircle(width: number, px: number, py: number, cx: number, cy: number) {
+
+}
+
+export function fill(layer: Layer, width: number, x: number, y: number, color: string) {
+  const queue: [number, number][] = [[x, y]];
+  const visited = new Set();
+  const pixels = [];
+
+  while (queue.length) {
+    const pos = queue.shift();
+    if (!pos) break;
+    const [x, y] = pos;
+    const idx = y * width + x;
+
+    if (visited.has(idx)) continue;
+    visited.add(idx);
+
+    if (layer[idx] === undefined) {
+      pixels.push(idx);
+      queue.push([x - 1, y]);
+      queue.push([x + 1, y]);
+      queue.push([x, y - 1]);
+      queue.push([x, y + 1]);
+    }
+  }
 }

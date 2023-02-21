@@ -12,8 +12,8 @@ export default function FramePanel() {
   };
 
   return <>
-    <ul id="frame" className="panel--list">
-      {store.clip.map((frame, idx) => {
+    <ul className="panel--list">
+      {store.sprite.map((frame, idx) => {
         const className = classNames({
           active: idx === store.frameIdx,
         });

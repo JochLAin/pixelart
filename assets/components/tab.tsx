@@ -1,7 +1,11 @@
 import classNames from "classnames";
 import { Children, HTMLProps, isValidElement, useId, useMemo, useState } from "react";
 
-export default function Tab(props: HTMLProps<HTMLUListElement>) {
+type TabProps = HTMLProps<HTMLUListElement> & {
+  bottom?: boolean,
+};
+
+export default function Tab(props: TabProps) {
   const [currentIdx, setCurrent] = useState<number>(0);
   const uuid = useId();
 
@@ -14,23 +18,29 @@ export default function Tab(props: HTMLProps<HTMLUListElement>) {
     }, [[], []])
   }, [props.children]);
 
+  if (!items.length) {
+    return <>{children}</>;
+  }
+
+  const tabs = <ul {...props} className={classNames(props.className, 'nav--tabs', props.bottom && 'nav--tabs-bottom')}>
+    {items.map((item, idx) => {
+      return <li key={`tab-${uuid}-${idx}`} className={classNames(idx === currentIdx && 'active')} onClick={() => setCurrent(idx)}>
+        {item.props.title}
+      </li>;
+    })}
+  </ul>;
+
+  const elements = [tabs, items[currentIdx]];
+  if (props.bottom) {
+    elements.reverse();
+  }
+
   return <>
-    {!!items.length && (
-      <>
-        <ul {...props} className={classNames(props.className, 'nav--tab')}>
-          {items.map((item, idx) => {
-            return <li key={`tab-${uuid}-${idx}`} className={classNames(idx === currentIdx && 'active')} onClick={() => setCurrent(idx)}>
-              {item.props.title}
-            </li>;
-          })}
-        </ul>
-        {items[currentIdx]}
-      </>
-    )}
+    {...elements}
     {children}
   </>;
 }
 
-export function TabItem(props: { title: string, children: any }) {
+export function TabItem(props: { title: any, children: any }) {
   return <>{props.children}</>;
 }
